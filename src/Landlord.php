@@ -90,7 +90,14 @@ class Landlord implements Scope
         }
 
         foreach ($this->getModelTenants($model) as $tenantColumn => $tenantId) {
-            $builder->where($model->getTable() . '.' . $tenantColumn, '=', $tenantId);
+            /**
+             * For anything but MongoDB, prefix the tenantColumn with the table name.
+             */
+            if(!$model instanceof \Jenssegers\Mongodb\Eloquent\Model){
+                $tenantColumn = $model->getTable() . '.' . $tenantColumn;
+            }
+
+            $builder->where($tenantColumn, '=', $tenantId);
         }
     }
 
